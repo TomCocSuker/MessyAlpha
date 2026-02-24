@@ -79,7 +79,7 @@ class ConversationViewModel() : ViewModel() {
                         val sharedName = ContactManager.getSharedNameForTopic(context, _topic.value)
                         // If we haven't shared our current name in this topic yet, send the hidden message
                         if (sharedName != myName) {
-                            val systemMsg = "$SYSTEM_MSG_PREFIX$myName__"
+                            val systemMsg = "$SYSTEM_MSG_PREFIX${myName}__"
                             repository.sendMessage(_topic.value, systemMsg)
                             ContactManager.setSharedNameForTopic(context, _topic.value, myName)
                         }
