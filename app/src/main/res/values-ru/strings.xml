@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Messy</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="welcome_to_messy">Добро пожаловать в Messy</string>
+    <string name="waiting_for_telegram">Ожидание авторизации Telegram...\nПожалуйста, откройте бота Telegram, нажмите \'Старт\', затем вернитесь в это приложение.</string>
+    <string name="cancel">Отмена</string>
+    <string name="continue_with_telegram">Продолжить с Telegram</string>
+    <string name="continue_with_google_apple">Продолжить с Google / Apple</string>
+    <string name="or_connect_crypto_wallet">Или подключите криптокошелек (WalletConnect)</string>
+    <string name="telegram_app_not_installed">Приложение Telegram не установлено.</string>
+    <string name="login_failed">Ошибка входа: %1$s</string>
+
+    <!-- Conversation List Screen -->
+    <string name="messages_title">Сообщения</string>
+    <string name="display_name">Имя профиля</string>
+    <string name="your_name_label">Ваше имя</string>
+    <string name="your_name_placeholder">например, Алиса</string>
+    <string name="save">Сохранить</string>
+    
+    <string name="log_out_title">Выйти</string>
+    <string name="log_out_confirmation">Вы уверены, что хотите выйти? Ваши данные останутся на устройстве, и вы сможете войти снова позже.</string>
+    <string name="log_out">Выйти</string>
+
+    <string name="my_addr">Мой адрес: %1$s...%2$s</string>
+    
+    <string name="setting_up_account">Настройка вашего аккаунта...</string>
+    <string name="error_prefix">Ошибка: %1$s</string>
+    <string name="clear_data_restart">Очистить данные и перезапустить</string>
+
+    <string name="new_conversation">Новый диалог</string>
+    <string name="wallet_address_or_ens">Адрес кошелька или ENS</string>
+    <string name="wallet_address_placeholder">vitalik.eth или 0x...</string>
+    <string name="start">Начать</string>
+
+    <string name="rename_chat_title">Переименовать чат</string>
+    <string name="custom_name_label">Пользовательское имя</string>
+    <string name="custom_name_placeholder">Оставьте пустым, чтобы очистить</string>
+    <string name="unnamed_group">Безымянная группа</string>
+    <string name="dm_prefix">ЛС: %1$s</string>
+    <string name="loading">Загрузка...</string>
+    <string name="unknown_chat">Неизвестный чат</string>
+    <string name="topic_prefix">Тема: %1$s...</string>
+
+    <!-- Message Screen -->
+    <string name="chat_title">Чат</string>
+    <string name="message_placeholder">Сообщение...</string>
+    <string name="send">Отправить</string>
+    <string name="unsupported_content">Неподдерживаемый контент</string>
+
+    <!-- Backup Screen -->
+    <string name="backup_and_restore_title">Резервное копирование</string>
+    <string name="encrypted_backup">Зашифрованная резервная копия</string>
+    <string name="backup_description">Ваши чаты зашифрованы с помощью AES-256 и вашего пароля. Сохраните копию на Google Диск, Яндекс Диск или любое другое устройство.</string>
+    <string name="create_backup_btn">📤  Создать копию</string>
+    <string name="restore_backup_btn">📥  Восстановить из копии</string>
+    <string name="processing">Обработка...</string>
+    
+    <string name="backup_hint">💡 Сохраните файл резервной копии на Google Диск или Яндекс Диск для облачного хранения. Запомните свой пароль — он нужен для восстановления!</string>
+
+    <string name="encrypt_backup_title">Зашифровать копию</string>
+    <string name="enter_password_encrypt">Введите пароль для шифрования копии:</string>
+    <string name="password_label">Пароль</string>
+    <string name="encrypt_and_save">Зашифровать и Сохранить</string>
+
+    <string name="restore_backup_dialog_title">Восстановить копию</string>
+    <string name="enter_password_restore">Введите пароль, использованный при создании копии:</string>
+    <string name="app_will_restart_warning">⚠️ Приложение будет перезапущено после восстановления.</string>
+    <string name="decrypt_and_restore">Расшифровать и Восстановить</string>
+
+    <string name="backup_success">✅ Копия успешно создана!</string>
+    <string name="backup_failed">❌ Ошибка создания копии. Проверьте журналы.</string>
+    <string name="restore_failed">❌ Ошибка восстановления. Неверный пароль или поврежденный файл.</string>
+    
+    <string name="language_english">English</string>
+    <string name="language_russian">Русский</string>
+    <string name="scan_qr_code">Сканировать QR-код</string>
+    <string name="my_qr_code">Мой QR-код</string>
+</resources>

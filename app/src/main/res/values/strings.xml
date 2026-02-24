@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Messy</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="welcome_to_messy">Welcome to Messy</string>
+    <string name="waiting_for_telegram">Waiting for Telegram authorization...\nPlease open the Telegram bot, click \'Start\', then return to this app.</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_with_telegram">Continue with Telegram</string>
+    <string name="continue_with_google_apple">Continue with Google / Apple</string>
+    <string name="or_connect_crypto_wallet">Or connect crypto wallet (WalletConnect)</string>
+    <string name="telegram_app_not_installed">Telegram app not installed.</string>
+    <string name="login_failed">Login failed: %1$s</string>
+
+    <!-- Conversation List Screen -->
+    <string name="messages_title">Messages</string>
+    <string name="display_name">Display Name</string>
+    <string name="your_name_label">Your Name</string>
+    <string name="your_name_placeholder">e.g. Alice</string>
+    <string name="save">Save</string>
+    
+    <string name="log_out_title">Log Out</string>
+    <string name="log_out_confirmation">Are you sure you want to log out? Your data will remain on the device and you can log back in later.</string>
+    <string name="log_out">Log Out</string>
+
+    <string name="my_addr">My Addr: %1$s...%2$s</string>
+    
+    <string name="setting_up_account">Setting up your account...</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="clear_data_restart">Clear Data &amp; Restart</string>
+
+    <string name="new_conversation">New Conversation</string>
+    <string name="wallet_address_or_ens">Wallet Address or ENS</string>
+    <string name="wallet_address_placeholder">vitalik.eth or 0x...</string>
+    <string name="start">Start</string>
+
+    <string name="rename_chat_title">Rename Chat</string>
+    <string name="custom_name_label">Custom Name</string>
+    <string name="custom_name_placeholder">Leave blank to clear</string>
+    <string name="unnamed_group">Unnamed Group</string>
+    <string name="dm_prefix">DM: %1$s</string>
+    <string name="loading">Loading...</string>
+    <string name="unknown_chat">Unknown Chat</string>
+    <string name="topic_prefix">Topic: %1$s...</string>
+
+    <!-- Message Screen -->
+    <string name="chat_title">Chat</string>
+    <string name="message_placeholder">Message...</string>
+    <string name="send">Send</string>
+    <string name="unsupported_content">Unsupported content</string>
+
+    <!-- Backup Screen -->
+    <string name="backup_and_restore_title">Backup &amp; Restore</string>
+    <string name="encrypted_backup">Encrypted Backup</string>
+    <string name="backup_description">Your chat data is encrypted with AES-256 using your password. Save to Google Drive, Yandex Disk, or any storage.</string>
+    <string name="create_backup_btn">📤  Create Backup</string>
+    <string name="restore_backup_btn">📥  Restore from Backup</string>
+    <string name="processing">Processing...</string>
+    
+    <string name="backup_hint">💡 Save the backup file to Google Drive or Yandex Disk for cloud storage. Remember your password — it\'s needed to restore!</string>
+
+    <string name="encrypt_backup_title">Encrypt Backup</string>
+    <string name="enter_password_encrypt">Enter a password to encrypt your backup:</string>
+    <string name="password_label">Password</string>
+    <string name="encrypt_and_save">Encrypt &amp; Save</string>
+
+    <string name="restore_backup_dialog_title">Restore Backup</string>
+    <string name="enter_password_restore">Enter the password used during backup:</string>
+    <string name="app_will_restart_warning">⚠️ The app will restart after restore.</string>
+    <string name="decrypt_and_restore">Decrypt &amp; Restore</string>
+
+    <string name="backup_success">✅ Backup created successfully!</string>
+    <string name="backup_failed">❌ Backup failed. Check logs.</string>
+    <string name="restore_failed">❌ Restore failed. Wrong password or corrupted file.</string>
+    
+    <string name="language_english">English</string>
+    <string name="language_russian">Русский</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="my_qr_code">My QR Code</string>
+</resources>
