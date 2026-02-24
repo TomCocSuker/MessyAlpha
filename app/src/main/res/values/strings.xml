@@ -18,6 +18,8 @@
     <string name="your_name_label">Your Name</string>
     <string name="your_name_placeholder">e.g. Alice</string>
     <string name="save">Save</string>
+    <string name="share_profile_name">Share my name</string>
+    <string name="share_profile_name_desc">Send your name to chat participants so they see who you are</string>
     
     <string name="log_out_title">Log Out</string>
     <string name="log_out_confirmation">Are you sure you want to log out? Your data will remain on the device and you can log back in later.</string>

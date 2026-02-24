@@ -78,6 +78,7 @@ fun ConversationListScreen(
     var showProfileDialog by remember { mutableStateOf(false) }
     var profileNameInput by remember { mutableStateOf("") }
     var myProfileName by remember { mutableStateOf(ContactManager.getMyProfileName(context)) }
+    var isProfileSharingEnabled by remember { mutableStateOf(ContactManager.isProfileSharingEnabled(context)) }
 
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showOptionsMenu by remember { mutableStateOf(false) }
@@ -95,16 +96,38 @@ fun ConversationListScreen(
             onDismissRequest = { showProfileDialog = false },
             title = { Text(stringResource(R.string.display_name)) },
             text = {
-                TextField(
-                    value = profileNameInput,
-                    onValueChange = { profileNameInput = it },
-                    label = { Text(stringResource(R.string.your_name_label)) },
-                    placeholder = { Text(stringResource(R.string.your_name_placeholder)) }
-                )
+                Column {
+                    TextField(
+                        value = profileNameInput,
+                        onValueChange = { profileNameInput = it },
+                        label = { Text(stringResource(R.string.your_name_label)) },
+                        placeholder = { Text(stringResource(R.string.your_name_placeholder)) }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.share_profile_name), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(R.string.share_profile_name_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = isProfileSharingEnabled,
+                            onCheckedChange = { isProfileSharingEnabled = it }
+                        )
+                    }
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
                     ContactManager.saveMyProfileName(context, profileNameInput)
+                    ContactManager.setProfileSharingEnabled(context, isProfileSharingEnabled)
                     myProfileName = ContactManager.getMyProfileName(context)
                     showProfileDialog = false
                 }) {

@@ -18,6 +18,8 @@
     <string name="your_name_label">Ваше имя</string>
     <string name="your_name_placeholder">например, Алиса</string>
     <string name="save">Сохранить</string>
+    <string name="share_profile_name">Поделиться моим именем</string>
+    <string name="share_profile_name_desc">Отправлять ваше имя собеседникам, чтобы они видели, кто вы</string>
     
     <string name="log_out_title">Выйти</string>
     <string name="log_out_confirmation">Вы уверены, что хотите выйти? Ваши данные останутся на устройстве, и вы сможете войти снова позже.</string>

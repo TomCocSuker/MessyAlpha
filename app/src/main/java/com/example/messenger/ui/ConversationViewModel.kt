@@ -2,6 +2,8 @@ package com.example.messenger.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.messenger.ClientManager
+import com.example.messenger.ContactManager
 import com.example.messenger.SyncManager
 import com.example.messenger.data.XmtpRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +14,8 @@ import org.xmtp.android.library.libxmtp.DecodedMessage
 
 class ConversationViewModel() : ViewModel() {
     private val repository = XmtpRepository()
+
+    private val SYSTEM_MSG_PREFIX = "__MESSENGER_PROFILE_UPDATE:"
 
     private val _messages = MutableStateFlow<List<DecodedMessage>>(emptyList())
     val messages: StateFlow<List<DecodedMessage>> = _messages.asStateFlow()
@@ -33,7 +37,8 @@ class ConversationViewModel() : ViewModel() {
     private fun loadMessagesLocal() {
         if (_topic.value.isEmpty()) return
         viewModelScope.launch {
-            _messages.value = repository.fetchMessagesLocal(_topic.value)
+            val msgs = repository.fetchMessagesLocal(_topic.value)
+            _messages.value = processAndFilterMessages(msgs)
         }
     }
 
@@ -55,7 +60,10 @@ class ConversationViewModel() : ViewModel() {
         if (_topic.value.isEmpty()) return
         viewModelScope.launch {
             repository.streamMessages(_topic.value).collect { newMessage ->
-                 _messages.value = _messages.value + newMessage
+                 val processedList = processAndFilterMessages(listOf(newMessage))
+                 if (processedList.isNotEmpty()) {
+                     _messages.value = _messages.value + processedList.first()
+                 }
             }
         }
     }
@@ -63,11 +71,53 @@ class ConversationViewModel() : ViewModel() {
     fun sendMessage(body: String) {
         viewModelScope.launch {
             try {
+                // Check if we need to share profile name first
+                val context = ClientManager.appContext
+                if (context != null && ContactManager.isProfileSharingEnabled(context)) {
+                    val myName = ContactManager.getMyProfileName(context)
+                    if (!myName.isNullOrBlank()) {
+                        val sharedName = ContactManager.getSharedNameForTopic(context, _topic.value)
+                        // If we haven't shared our current name in this topic yet, send the hidden message
+                        if (sharedName != myName) {
+                            val systemMsg = "$SYSTEM_MSG_PREFIX$myName__"
+                            repository.sendMessage(_topic.value, systemMsg)
+                            ContactManager.setSharedNameForTopic(context, _topic.value, myName)
+                        }
+                    }
+                }
+
                 repository.sendMessage(_topic.value, body)
                 // Sending successful, the stream will catch the local echo or remote response
             } catch (e: Exception) {
                 // Handle error
             }
         }
+    }
+
+    /**
+     * Processes a list of messages:
+     * 1. Detects and extracts system profile update messages.
+     * 2. Saves the alias locally.
+     * 3. Filters out the system messages so they don't appear in the UI.
+     */
+    private fun processAndFilterMessages(msgs: List<DecodedMessage>): List<DecodedMessage> {
+        val filtered = mutableListOf<DecodedMessage>()
+        val context = ClientManager.appContext ?: return msgs
+
+        for (msg in msgs) {
+            val body = msg.body as? String ?: continue
+            if (body.startsWith(SYSTEM_MSG_PREFIX) && body.endsWith("__")) {
+                // It's a system message, process it
+                val name = body.removePrefix(SYSTEM_MSG_PREFIX).removeSuffix("__")
+                if (name.isNotBlank()) {
+                    // Only save if it's from a peer, or even if from us, to sync across our devices
+                    ContactManager.saveAlias(context, msg.senderInboxId, name)
+                }
+            } else {
+                // Regular message
+                filtered.add(msg)
+            }
+        }
+        return filtered
     }
 }

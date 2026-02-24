@@ -13,6 +13,8 @@ object ContactManager {
 
     private const val PREFS_NAME = "xmtp_contact_aliases"
     private const val MY_PROFILE_NAME_KEY = "my_profile_name"
+    private const val PROFILE_SHARING_ENABLED_KEY = "profile_sharing_enabled"
+    private const val SHARED_TOPICS_PREFS_NAME = "xmtp_shared_topics"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -55,5 +57,37 @@ object ContactManager {
      */
     fun getMyProfileName(context: Context): String? {
         return getPrefs(context).getString(MY_PROFILE_NAME_KEY, null)
+    }
+
+    /**
+     * Checks if profile sharing is enabled (default is false).
+     */
+    fun isProfileSharingEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(PROFILE_SHARING_ENABLED_KEY, false)
+    }
+
+    /**
+     * Sets whether profile sharing is enabled.
+     */
+    fun setProfileSharingEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(PROFILE_SHARING_ENABLED_KEY, enabled).apply()
+    }
+
+    /**
+     * Checks if the current profile name was already shared in the given topic.
+     * We store the shared name itself for the topic, so if the user changes their name,
+     * it will be re-shared (since the stored name won't match the new name).
+     */
+    fun getSharedNameForTopic(context: Context, topic: String): String? {
+        val prefs = context.getSharedPreferences(SHARED_TOPICS_PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(topic, null)
+    }
+
+    /**
+     * Records that a specific profile name was shared in the given topic.
+     */
+    fun setSharedNameForTopic(context: Context, topic: String, name: String) {
+        val prefs = context.getSharedPreferences(SHARED_TOPICS_PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(topic, name).apply()
     }
 }
