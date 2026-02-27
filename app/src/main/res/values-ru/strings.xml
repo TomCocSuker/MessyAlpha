@@ -11,6 +11,27 @@
     <string name="or_connect_crypto_wallet">Или подключите криптокошелек (WalletConnect)</string>
     <string name="telegram_app_not_installed">Приложение Telegram не установлено.</string>
     <string name="login_failed">Ошибка входа: %1$s</string>
+    <string name="dpi_bypass_toggle">Обход DPI (фрагментация)</string>
+    <string name="dpi_bypass_desc">Использовать локальный туннель для обхода сетевых ограничений. Проксирует трафик только этого приложения.</string>
+    <string name="cycle_dpi_strategy">Сменить стратегию</string>
+    <string name="advanced_dpi_settings">Расширенные настройки DPI</string>
+    <string name="custom_strategy_title">Настройка своей стратегии</string>
+    <string name="fake_header_label">Фальшивый TLS Header</string>
+    <string name="fake_header_desc">Отправляет поддельный TLS Client Hello перед настоящим.</string>
+    <string name="split_s1_label">Разделение первого байта</string>
+    <string name="split_s1_desc">Отправляет первый байт рукопожатия в отдельном пакете.</string>
+    <string name="disorder_label">Disorder (перестановка фрагментов)</string>
+    <string name="disorder_desc">Отправляет первые несколько байтов рукопожатия не по порядку.</string>
+    <string name="sni_split_label">Разделение на SNI</string>
+    <string name="sni_split_desc">Разрезает пакет ровно в том месте, где начинается доменное имя (SNI).</string>
+    <string name="oob_label">TCP Urgent (OOB)</string>
+    <string name="oob_desc">Внедряет случайный байт TCP Out-of-Band для запутывания некоторых систем DPI.</string>
+    <string name="tail_size_label">Размер хвоста фрагмента</string>
+    <string name="delay_label">Задержка между пакетами (мс)</string>
+    <string name="strategy_command_label">Командная строка стратегии (ByeDPI-стиль)</string>
+    <string name="strategy_command_desc">Расширенно: введите флаги (напр. -s1 -q1 -Ar -s5 -At -As -s1 -s-1). Перекрывает переключатели выше.</string>
+    <string name="paste_example">Вставить пример ByeDPI</string>
+    <string name="dpi_config_guide"><b>Гайд по настройке DPI:</b>\n\n• <b>Header + Split S1:</b> Хорошо помогает против простой фильтрации по SNI.\n• <b>Disorder:</b> Эффективен против stateful DPI, которые ожидают строгий порядок пакетов.\n• <b>SNI Split + OOB:</b> Лучший вариант для агрессивных блокировок с глубоким анализом контента.\n• <b>Delay:</b> Увеличение задержки помогает, если DPI использует таймауты для сборки пакетов.\n\n<b>Продвинутые команды:</b>\n• <b>-s [N]:</b> Сплит на позиции N. (+s относительно SNI)\n• <b>-q [N]:</b> Disorder на позиции N.\n• <b>-o [N]:</b> OOB на позиции N.\n• <b>-As/t/r:</b> Применить к SSL/TCP/Redirects.</string>
 
     <!-- Conversation List Screen -->
     <string name="messages_title">Сообщения</string>
@@ -44,6 +65,15 @@
     <string name="loading">Загрузка...</string>
     <string name="unknown_chat">Неизвестный чат</string>
     <string name="topic_prefix">Тема: %1$s...</string>
+
+    <!-- Context Menu -->
+    <string name="action_rename">Переименовать</string>
+    <string name="action_pin">Закрепить</string>
+    <string name="action_unpin">Открепить</string>
+    <string name="action_mute">Выключить уведомления</string>
+    <string name="action_unmute">Включить уведомления</string>
+    <string name="action_delete">Удалить</string>
+    <string name="delete_chat_confirmation">Вы уверены, что хотите удалить этот чат? Он будет скрыт из вашего списка, но сообщения не удалятся из сети.</string>
 
     <!-- Message Screen -->
     <string name="chat_title">Чат</string>
@@ -79,4 +109,37 @@
     <string name="language_russian">Русский</string>
     <string name="scan_qr_code">Сканировать QR-код</string>
     <string name="my_qr_code">Мой QR-код</string>
+    <string name="tab_chats">Чаты</string>
+    <string name="tab_groups">Группы</string>
+    <string name="add_member">Добавить участника</string>
+    <string name="add_member_dialog_title">Добавить в группу</string>
+    <string name="add">Добавить</string>
+
+    <!-- Group Creation -->
+    <string name="create_group">Создать группу</string>
+    <string name="new_group">Новая группа</string>
+    <string name="group_name">Название группы</string>
+    <string name="member_address">Адрес участника (0x...)</string>
+    <string name="members_list">Участники (%1$d)</string>
+    <string name="remove">Удалить</string>
+    <string name="create">Создать</string>
+    <string name="error_group_name_required">Название группы обязательно</string>
+    <string name="error_at_least_one_member">Добавьте хотя бы одного участника</string>
+
+    <!-- Group Info -->
+    <string name="group_members">Участники группы</string>
+    <string name="member">Участник</string>
+    <string name="admin">Админ</string>
+    <string name="super_admin">Супер-админ</string>
+    <string name="group_info">О группе</string>
+
+    <!-- Background Service -->
+    <string name="xmtp_service_channel_name">Синхронизация XMTP</string>
+    <string name="xmtp_service_channel_desc">Поддерживает соединение с сетью XMTP для получения сообщений.</string>
+    <string name="xmtp_service_listening">Ожидание новых сообщений...</string>
+    <string name="new_message_notification_title">Новое сообщение</string>
+    <string name="download_image">Скачать</string>
+    <string name="image_saved">Изображение сохранено в галерею</string>
+    <string name="image_save_error">Ошибка при сохранении изображения</string>
+    <string name="shared_media">Медиа</string>
 </resources>

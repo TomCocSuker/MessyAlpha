@@ -11,6 +11,27 @@
     <string name="or_connect_crypto_wallet">Or connect crypto wallet (WalletConnect)</string>
     <string name="telegram_app_not_installed">Telegram app not installed.</string>
     <string name="login_failed">Login failed: %1$s</string>
+    <string name="dpi_bypass_toggle">DPI Bypass (Fragmentation)</string>
+    <string name="dpi_bypass_desc">Use a localized tunnel to bypass network blocking. Only routing traffic for this app.</string>
+    <string name="cycle_dpi_strategy">Cycle Strategy</string>
+    <string name="advanced_dpi_settings">Advanced DPI Settings</string>
+    <string name="custom_strategy_title">Custom Strategy Configuration</string>
+    <string name="fake_header_label">Fake TLS Header</string>
+    <string name="fake_header_desc">Sends a dummy TLS Client Hello before the real one.</string>
+    <string name="split_s1_label">Split First Byte</string>
+    <string name="split_s1_desc">Sends the first byte of the handshake in a separate packet.</string>
+    <string name="disorder_label">Disorder Fragments</string>
+    <string name="disorder_desc">Sends the first few bytes of the handshake out of order.</string>
+    <string name="sni_split_label">Split at SNI</string>
+    <string name="sni_split_desc">Splits the packet exactly where the domain name (SNI) begins.</string>
+    <string name="oob_label">TCP Urgent (OOB)</string>
+    <string name="oob_desc">Injects a random TCP Out-of-Band byte to confuse some DPI systems.</string>
+    <string name="tail_size_label">Tail Fragment Size</string>
+    <string name="delay_label">Inter-packet Delay (ms)</string>
+    <string name="strategy_command_label">Strategy Command String (ByeDPI-style)</string>
+    <string name="strategy_command_desc">Advanced: Enter raw flags (e.g. -s1 -q1 -Ar -s5 -At -As -s1 -s-1). Overrides individual toggles.</string>
+    <string name="paste_example">Paste ByeDPI Example</string>
+    <string name="dpi_config_guide"><b>DPI Bypass Guide:</b>\n\n• <b>Header + Split S1:</b> Good for simple SNI filtering.\n• <b>Disorder:</b> Effective against stateful DPI that expects strict ordering.\n• <b>SNI Split + OOB:</b> Best for aggressive blocking that inspects packet content deeply.\n• <b>Delay:</b> Increasing delay helps if the DPI uses reassembly timeouts.\n\n<b>Advanced Commands:</b>\n• <b>-s [N]:</b> Split at pos N. (+s for SNI relative)\n• <b>-q [N]:</b> Disorder at pos N.\n• <b>-o [N]:</b> OOB at pos N.\n• <b>-As/t/r:</b> Apply to SSL/TCP/Redirects.</string>
 
     <!-- Conversation List Screen -->
     <string name="messages_title">Messages</string>
@@ -45,11 +66,24 @@
     <string name="unknown_chat">Unknown Chat</string>
     <string name="topic_prefix">Topic: %1$s...</string>
 
+    <!-- Context Menu -->
+    <string name="action_rename">Rename</string>
+    <string name="action_pin">Pin</string>
+    <string name="action_unpin">Unpin</string>
+    <string name="action_mute">Mute</string>
+    <string name="action_unmute">Unmute</string>
+    <string name="action_delete">Delete</string>
+    <string name="delete_chat_confirmation">Are you sure you want to delete this chat? It will be removed from your list, but messages are not deleted from the network.</string>
+
     <!-- Message Screen -->
     <string name="chat_title">Chat</string>
     <string name="message_placeholder">Message...</string>
     <string name="send">Send</string>
     <string name="unsupported_content">Unsupported content</string>
+    <string name="download_image">Download</string>
+    <string name="image_saved">Image saved to gallery</string>
+    <string name="image_save_error">Failed to save image</string>
+    <string name="shared_media">Shared Media</string>
 
     <!-- Backup Screen -->
     <string name="backup_and_restore_title">Backup &amp; Restore</string>
@@ -79,4 +113,33 @@
     <string name="language_russian">Русский</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="my_qr_code">My QR Code</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_groups">Groups</string>
+    <string name="add_member">Add Member</string>
+    <string name="add_member_dialog_title">Add Member to Group</string>
+    <string name="add">Add</string>
+    
+    <!-- Group Creation -->
+    <string name="create_group">Create Group</string>
+    <string name="new_group">New Group</string>
+    <string name="group_name">Group Name</string>
+    <string name="member_address">Member Address (0x...)</string>
+    <string name="members_list">Members (%1$d)</string>
+    <string name="remove">Remove</string>
+    <string name="create">Create</string>
+    <string name="error_group_name_required">Group name is required</string>
+    <string name="error_at_least_one_member">Add at least one member</string>
+    
+    <!-- Group Info -->
+    <string name="group_members">Group Members</string>
+    <string name="member">Member</string>
+    <string name="admin">Admin</string>
+    <string name="super_admin">Super Admin</string>
+    <string name="group_info">Group Info</string>
+
+    <!-- Background Service -->
+    <string name="xmtp_service_channel_name">XMTP Sync</string>
+    <string name="xmtp_service_channel_desc">Keeps you connected to the XMTP network for new messages.</string>
+    <string name="xmtp_service_listening">Listening for new messages...</string>
+    <string name="new_message_notification_title">New Message</string>
 </resources>

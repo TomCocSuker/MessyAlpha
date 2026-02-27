@@ -34,7 +34,7 @@ class ScwManager(private val eoaPrivateKeyHex: String) {
      * for the REST API call to `https://api.pimlico.io/v2/137/rpc`.
      */
     suspend fun deploySmartContractWallet() {
-        val apiKey = "pim_mc926YtupnW2muL7nzqRBc"
+        val apiKey = BuildConfig.PIMLICO_API_KEY
         val bundlerUrl = "https://api.pimlico.io/v2/137/rpc?apikey=$apiKey"
         // 1. Construct UserOperation (initCode = Factory.createAccount(eoaAddress, salt))
         // 2. Request Paymaster sponsorship via Pimlico API (pm_sponsorUserOperation)

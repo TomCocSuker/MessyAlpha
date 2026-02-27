@@ -7,6 +7,13 @@ android {
     namespace 'com.example.messenger'
     compileSdk 34
 
+    // Load local.properties
+    def localProperties = new Properties()
+    def localPropertiesFile = rootProject.file('local.properties')
+    if (localPropertiesFile.exists()) {
+        localProperties.load(new FileInputStream(localPropertiesFile))
+    }
+
     defaultConfig {
         applicationId "com.example.messenger"
         minSdk 26
@@ -18,6 +25,15 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        // Add API keys from local.properties
+        buildConfigField "String", "HUDDLE_PROJECT_ID", "\"${localProperties.getProperty('HUDDLE_PROJECT_ID', 'MOCK_PROJECT_ID')}\""
+        buildConfigField "String", "HUDDLE_API_KEY", "\"${localProperties.getProperty('HUDDLE_API_KEY', 'MOCK_API_KEY')}\""
+        buildConfigField "String", "WC_PROJECT_ID", "\"${localProperties.getProperty('WC_PROJECT_ID', 'MOCK_WC_ID')}\""
+        buildConfigField "String", "WEB3AUTH_CLIENT_ID", "\"${localProperties.getProperty('WEB3AUTH_CLIENT_ID', 'MOCK_CLIENT_ID')}\""
+        buildConfigField "String", "PIMLICO_API_KEY", "\"${localProperties.getProperty('PIMLICO_API_KEY', 'MOCK_PIMLICO_KEY')}\""
+        buildConfigField "String", "WEB3AUTH_VERIFIER_ID", "\"${localProperties.getProperty('WEB3AUTH_VERIFIER_ID', 'messy-telegram-id')}\""
+        buildConfigField "String", "BACKEND_DOMAIN", "\"${localProperties.getProperty('BACKEND_DOMAIN', 'https://lance-judicial-scrutinizingly.ngrok-free.dev')}\""
     }
 
     buildTypes {
@@ -35,6 +51,7 @@ android {
     }
     buildFeatures {
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.0'
@@ -50,6 +67,10 @@ android {
 
 configurations.all {
     exclude group: 'com.google.guava', module: 'listenablefuture'
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.google.protobuf:protobuf-javalite') using module('com.google.protobuf:protobuf-java:4.26.1')
+        substitute module('com.google.protobuf:protobuf-kotlin-lite') using module('com.google.protobuf:protobuf-kotlin:4.26.1')
+    }
 }
 
 dependencies {
@@ -72,13 +93,14 @@ dependencies {
 
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.navigation:navigation-compose:2.7.2'
     implementation 'androidx.concurrent:concurrent-futures:1.2.0'
     implementation 'com.google.accompanist:accompanist-navigation-material:0.34.0'
 
     
     // XMTP SDK
-    implementation 'org.xmtp:android:4.0.3'
+    implementation project(':xmtp-lib')
 
     // WalletConnect V2
     implementation platform('com.walletconnect:android-bom:1.34.0')
@@ -105,6 +127,9 @@ dependencies {
     // ZXing for QR Code generation and scanning
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.google.zxing:core:3.5.2'
+
+    // Huddle01 SDK
+    implementation 'com.github.Huddle01:Kotlin-Client:1.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -15,15 +15,15 @@ class Web3AuthManager(private val context: Context) {
     init {
         // Configure Custom JWT Verifier for Telegram
         val loginConfigItem = com.web3auth.core.types.LoginConfigItem(
-            verifier = "messy-telegram-id",
+            verifier = BuildConfig.WEB3AUTH_VERIFIER_ID,
             typeOfLogin = com.web3auth.core.types.TypeOfLogin.JWT,
-            clientId = "BIKEeUHEULrcNymnEzVquqDuWWROeIoWgR2YeXphRDupH2NCSVOKbRIoCKw_IMIEcLDPo21WmfM3XKn1OfSeye0"
+            clientId = BuildConfig.WEB3AUTH_CLIENT_ID
         )
         val loginConfig = hashMapOf("jwt" to loginConfigItem)
 
         // Initialize Web3Auth with the provided Client ID and Custom Config
         val web3AuthOptions = Web3AuthOptions(
-            clientId = "BIKEeUHEULrcNymnEzVquqDuWWROeIoWgR2YeXphRDupH2NCSVOKbRIoCKw_IMIEcLDPo21WmfM3XKn1OfSeye0",
+            clientId = BuildConfig.WEB3AUTH_CLIENT_ID,
             network = Network.SAPPHIRE_DEVNET, // Network must match the dashboard project type
             redirectUrl = Uri.parse("web3auth://com.example.messenger"),
             loginConfig = loginConfig
@@ -53,7 +53,7 @@ class Web3AuthManager(private val context: Context) {
         val extraLoginOptions = com.web3auth.core.types.ExtraLoginOptions(
             id_token = idToken,
             verifierIdField = "sub", // Standard claim for user ID in JWT, adjust if your backend uses a different claim for Telegram ID
-            domain = "https://lance-judicial-scrutinizingly.ngrok-free.dev" // Matches your backend domain
+            domain = BuildConfig.BACKEND_DOMAIN // Matches your backend domain
         )
         
         val loginParams = LoginParams(

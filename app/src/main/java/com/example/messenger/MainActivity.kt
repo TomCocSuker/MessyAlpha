@@ -3,6 +3,8 @@ package com.example.messenger
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
@@ -13,10 +15,17 @@ import com.example.messenger.ui.*
 import com.walletconnect.wcmodal.ui.walletConnectModalGraph
 import java.security.SecureRandom
 import android.util.Log
+import android.os.PowerManager
+import android.provider.Settings
+import android.content.Intent
+import android.net.Uri
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.net.URLEncoder
 import java.net.URLDecoder
 
-import androidx.activity.compose.setContent
 import com.google.accompanist.navigation.material.*
 
 class MainActivity : AppCompatActivity() {
@@ -55,11 +64,42 @@ class MainActivity : AppCompatActivity() {
                 val navController = rememberNavController(bottomSheetNavigator)
                 val clientState by ClientManager.clientState.collectAsState()
                 
+                val vpnIntent by ClientManager.vpnPermissionIntent.collectAsState()
+                val vpnLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    if (result.resultCode == RESULT_OK) {
+                        Log.i("MainActivity", "VPN permission granted")
+                        ClientManager.clearVpnIntent()
+                        ClientManager.refreshDpiBypassState(context)
+                    } else {
+                        Log.w("MainActivity", "VPN permission denied")
+                        ClientManager.clearVpnIntent()
+                    }
+                }
+
+                LaunchedEffect(vpnIntent) {
+                    vpnIntent?.let {
+                        Log.i("MainActivity", "Launching VPN permission dialog")
+                        vpnLauncher.launch(it)
+                    }
+                }
+
                 LaunchedEffect(clientState) {
                     if (clientState is ClientManager.ClientState.Ready ||
                         clientState is ClientManager.ClientState.Loading) {
-                        navController.navigate("conversation_list") {
-                            popUpTo("onboarding") { inclusive = true }
+                        
+                        // Check for conversation in intent (from notification)
+                        val extraTopic = intent?.getStringExtra("conversation_topic")
+                        if (extraTopic != null) {
+                            val encodedTopic = URLEncoder.encode(extraTopic, "UTF-8")
+                            navController.navigate("message/${encodedTopic}") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate("conversation_list") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
                         }
                     }
                 }
@@ -76,44 +116,90 @@ class MainActivity : AppCompatActivity() {
                                 }
                             )
                         }
-                    composable("conversation_list") {
-                        val mainViewModel: MainViewModel = viewModel()
-                        ConversationListScreen(
-                            viewModel = mainViewModel, 
-                            onConversationClick = { topic -> 
-                                val encodedTopic = URLEncoder.encode(topic, "UTF-8")
-                                navController.navigate("message/${encodedTopic}")
-                            },
-                            onBackupClick = {
-                                navController.navigate("backup")
-                            }
-                        )
-                    }
-                    composable(
-                        route = "message/{topic}",
-                        arguments = listOf(navArgument("topic") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val encodedTopic = backStackEntry.arguments?.getString("topic") ?: return@composable
-                        val topic = URLDecoder.decode(encodedTopic, "UTF-8")
-                        val convViewModel: ConversationViewModel = viewModel()
-                        
-                        LaunchedEffect(topic) {
-                            convViewModel.setTopic(topic)
+                        composable("conversation_list") {
+                            val mainViewModel: MainViewModel = viewModel()
+                            ConversationListScreen(
+                                viewModel = mainViewModel, 
+                                onConversationClick = { topic -> 
+                                    val encodedTopic = URLEncoder.encode(topic, "UTF-8")
+                                    navController.navigate("message/${encodedTopic}")
+                                },
+                                onBackupClick = {
+                                    navController.navigate("backup")
+                                },
+                                onAdvancedDpiClick = {
+                                    navController.navigate("advanced_dpi")
+                                },
+                                onNewGroupClick = {
+                                    navController.navigate("create_group")
+                                }
+                            )
                         }
-                        
-                        MessageScreen(
-                            viewModel = convViewModel, 
-                            onBack = { navController.popBackStack() }
-                        )
+                        composable(
+                            route = "message/{topic}",
+                            arguments = listOf(navArgument("topic") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val encodedTopic = backStackEntry.arguments?.getString("topic") ?: return@composable
+                            val topic = URLDecoder.decode(encodedTopic, "UTF-8")
+                            val convViewModel: ConversationViewModel = viewModel()
+                            
+                            LaunchedEffect(topic) {
+                                convViewModel.setTopic(topic)
+                            }
+                            
+                            MessageScreen(
+                                viewModel = convViewModel, 
+                                onBack = { navController.popBackStack() },
+                                onGroupInfoClick = { clickedTopic ->
+                                    val encoded = URLEncoder.encode(clickedTopic, "UTF-8")
+                                    navController.navigate("group_members/$encoded")
+                                }
+                            )
+                        }
+                        composable("backup") {
+                            BackupScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("advanced_dpi") {
+                            AdvancedDpiSettingsScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("create_group") {
+                            val mainViewModel: MainViewModel = viewModel()
+                            CreateGroupScreen(
+                                viewModel = mainViewModel,
+                                onBack = { navController.popBackStack() },
+                                onCreated = { topic ->
+                                    val encodedTopic = URLEncoder.encode(topic, "UTF-8")
+                                    navController.navigate("message/${encodedTopic}") {
+                                        popUpTo("create_group") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable(
+                            route = "group_members/{topic}",
+                            arguments = listOf(navArgument("topic") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val encodedTopic = backStackEntry.arguments?.getString("topic") ?: return@composable
+                            val topic = URLDecoder.decode(encodedTopic, "UTF-8")
+                            val convViewModel: ConversationViewModel = viewModel()
+                            
+                            LaunchedEffect(topic) {
+                                convViewModel.setTopic(topic)
+                            }
+                            
+                            GroupMembersScreen(
+                                viewModel = convViewModel,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        walletConnectModalGraph(navController)
                     }
-                    composable("backup") {
-                        BackupScreen(onBack = { navController.popBackStack() })
-                    }
-                    walletConnectModalGraph(navController)
                 }
             }
-        }
-    } catch (t: Throwable) {
+            
+            checkAndRequestBatteryOptimizations()
+            checkAndRequestNotificationPermission()
+        } catch (t: Throwable) {
             val msg = "MainActivity: Error in setContent: ${t.message}"
             println(msg)
             Log.wtf("MainActivity", msg, t)
@@ -125,6 +211,29 @@ class MainActivity : AppCompatActivity() {
         // Pass the deeply linked URL to Web3Auth to resume the login flow
         if (this::web3AuthManager.isInitialized) {
             web3AuthManager.web3Auth.setResultUrl(intent?.data)
+        }
+    }
+
+    private fun checkAndRequestBatteryOptimizations() {
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        val packageName = packageName
+        if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error requesting battery optimization exemption: ${e.message}")
+            }
+        }
+    }
+
+    private fun checkAndRequestNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1002)
+            }
         }
     }
 }

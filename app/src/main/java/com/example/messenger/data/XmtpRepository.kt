@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.xmtp.android.library.Conversation
+import org.xmtp.android.library.SendOptions
+import org.xmtp.android.library.codecs.Attachment
+import org.xmtp.android.library.codecs.ContentTypeAttachment
 import org.xmtp.android.library.libxmtp.DecodedMessage
 
 class XmtpRepository {
@@ -64,6 +67,37 @@ class XmtpRepository {
         }
     }
 
+    suspend fun createGroup(groupName: String, members: List<String>): Conversation.Group = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        val identities = members.map { address ->
+            org.xmtp.android.library.libxmtp.PublicIdentity(
+                org.xmtp.android.library.libxmtp.IdentityKind.ETHEREUM,
+                address
+            )
+        }
+
+        // 1. Create the group with identities directly
+        val group = client.conversations.newGroupWithIdentities(
+            identities = identities,
+            groupName = groupName,
+            groupDescription = ""
+        )
+        
+        Conversation.Group(group)
+    }
+
+    suspend fun addMember(topic: String, address: String) = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        val conversation = client.conversations.findConversationByTopic(topic)
+        if (conversation is org.xmtp.android.library.Conversation.Group) {
+            val identity = org.xmtp.android.library.libxmtp.PublicIdentity(
+                org.xmtp.android.library.libxmtp.IdentityKind.ETHEREUM,
+                address
+            )
+            conversation.group.addMembersByIdentity(listOf(identity))
+        } else {
+            throw Exception("Conversation not found or not a group")
+        }
+    }
+
     /**
      * Reads messages from the local XMTP SQLite DB only — instant, no network.
      */
@@ -77,10 +111,29 @@ class XmtpRepository {
      * Used for manual refresh within a chat.
      */
     suspend fun fetchMessagesWithSync(topic: String): List<DecodedMessage> = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        // Full sync to ensure all participants and conversations are up-to-date
+        try {
+            client.conversations.sync()
+        } catch (e: Exception) {
+            android.util.Log.e("XmtpRepository", "Full sync failed: ${e.message}")
+        }
+
         val conversation = client.conversations.findConversationByTopic(topic)
         when (conversation) {
-            is Conversation.Group -> conversation.group.sync()
-            is Conversation.Dm -> conversation.dm.sync()
+            is Conversation.Group -> {
+                try {
+                    conversation.group.sync()
+                } catch (e: Exception) {
+                    android.util.Log.e("XmtpRepository", "Group sync failed for $topic: ${e.message}")
+                }
+            }
+            is Conversation.Dm -> {
+                try {
+                    conversation.dm.sync()
+                } catch (e: Exception) {
+                    android.util.Log.e("XmtpRepository", "DM sync failed for $topic: ${e.message}")
+                }
+            }
             else -> {}
         }
         (conversation?.messages() ?: emptyList()).reversed()
@@ -96,5 +149,27 @@ class XmtpRepository {
     suspend fun sendMessage(topic: String, body: String) = kotlinx.coroutines.withContext(Dispatchers.IO) {
         val conversation = client.conversations.findConversationByTopic(topic)
         conversation?.send(body)
+    }
+
+    suspend fun sendAttachment(topic: String, attachment: Attachment) = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        val conversation = client.conversations.findConversationByTopic(topic)
+        conversation?.send(
+            content = attachment,
+            options = SendOptions(contentType = ContentTypeAttachment)
+        )
+    }
+
+    suspend fun fetchGroupMembers(topic: String): List<Any> = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        val conversation = client.conversations.findConversationByTopic(topic)
+        if (conversation is org.xmtp.android.library.Conversation.Group) {
+            try {
+                conversation.group.sync()
+            } catch (e: Exception) {
+                android.util.Log.e("XmtpRepository", "Failed to sync group state: ${e.message}")
+            }
+            conversation.group.members()
+        } else {
+            emptyList()
+        }
     }
 }

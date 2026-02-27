@@ -27,7 +27,6 @@ object SyncManager {
     private const val KEY_INITIAL_SYNC_DONE = "initial_sync_done"
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var streamJob: Job? = null
     private var syncJob: Job? = null
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
@@ -107,17 +106,34 @@ object SyncManager {
                 }
 
                 // ── Step 3: Per-conversation message sync ────────────────
-                val conversations = client.conversations.list()
-                val total = conversations.size
-                Log.d(TAG, "Step 3: syncing messages for $total conversations")
+                val address = KeyManager.getSavedWalletAddress(
+                    ClientManager.appContext ?: return@launch
+                )
+                val deletedTopics = if (address != null) {
+                    ConversationPrefsManager.getDeletedTopics(ClientManager.appContext!!, address)
+                } else {
+                    emptySet()
+                }
 
-                if (total > 0) {
+                val allConversations = client.conversations.list()
+                val conversations = allConversations.filter { !deletedTopics.contains(it.topic) }
+                
+                val totalAll = allConversations.size
+                val totalToSync = conversations.size
+                
+                if (totalAll > totalToSync) {
+                    Log.d(TAG, "Step 3: skipping ${totalAll - totalToSync} deleted conversations. Syncing $totalToSync total.")
+                } else {
+                    Log.d(TAG, "Step 3: syncing messages for $totalToSync conversations")
+                }
+
+                if (totalToSync > 0) {
                     conversations.forEachIndexed { index, conversation ->
                         try {
                             _syncState.value = SyncState.Syncing(
-                                phase = "Загрузка сообщений ${index + 1}/$total",
+                                phase = "Загрузка сообщений ${index + 1}/$totalToSync",
                                 syncedCount = index + 1,
-                                totalCount = total
+                                totalCount = totalToSync
                             )
                             when (conversation) {
                                 is Conversation.Group -> conversation.group.sync()
@@ -131,18 +147,15 @@ object SyncManager {
 
                 // ── Result ───────────────────────────────────────────────
                 _syncState.value = SyncState.SyncResult(
-                    success = total > 0,
-                    conversationsFound = total,
-                    messagesPhase = if (total > 0) "✅ Синхронизировано $total диалогов"
+                    success = totalAll > 0,
+                    conversationsFound = totalAll,
+                    messagesPhase = if (totalAll > 0) "✅ Синхронизировано $totalToSync диалогов"
                                     else "⚠️ Диалоги не найдены (0 на сервере)"
                 )
-                Log.d(TAG, "Sync finished: $total conversations")
+                Log.d(TAG, "Sync finished: $totalAll conversations found, $totalToSync synced")
 
                 // Auto-backup to Documents/ so data survives reinstall
-                if (total > 0) {
-                    val address = KeyManager.getSavedWalletAddress(
-                        ClientManager.appContext ?: return@launch
-                    )
+                if (totalAll > 0) {
                     if (address != null) {
                         val backed = BackupManager.autoBackup(
                             ClientManager.appContext!!, address
@@ -160,45 +173,8 @@ object SyncManager {
     }
 
     /**
-     * Starts real-time streaming for new conversations and messages.
+     * Clear sync state (used on logout/clean start)
      */
-    fun startRealtimeStreams() {
-        if (streamJob?.isActive == true) {
-            Log.d(TAG, "Streams already active, skipping")
-            return
-        }
-
-        streamJob = scope.launch {
-            try {
-                val client = ClientManager.client
-
-                launch {
-                    try {
-                        client.conversations.stream().collect { conversation ->
-                            Log.d(TAG, "New conversation via stream: ${conversation.topic}")
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Conversation stream error: ${e.message}")
-                    }
-                }
-
-                launch {
-                    try {
-                        client.conversations.streamAllMessages().collect { message ->
-                            Log.d(TAG, "New message via stream in: ${message.topic}")
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Message stream error: ${e.message}")
-                    }
-                }
-
-                Log.d(TAG, "Real-time streams started")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to start streams: ${e.message}", e)
-            }
-        }
-    }
-
     fun isInitialSyncDone(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_INITIAL_SYNC_DONE, false)
@@ -219,11 +195,9 @@ object SyncManager {
     }
 
     fun stop() {
-        streamJob?.cancel()
-        streamJob = null
         syncJob?.cancel()
         syncJob = null
         _syncState.value = SyncState.Idle
-        Log.d(TAG, "All sync/stream jobs stopped")
+        Log.d(TAG, "All sync jobs stopped")
     }
 }

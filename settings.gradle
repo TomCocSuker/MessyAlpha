@@ -5,13 +5,18 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+include(":app")
+include(":xmtp-lib")
+project(":xmtp-lib").projectDir = file("../xmtp-android/library")
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 rootProject.name = "Messenger"
-include(":app")

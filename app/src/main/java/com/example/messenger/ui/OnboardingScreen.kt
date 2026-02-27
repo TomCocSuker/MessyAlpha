@@ -12,6 +12,8 @@ import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import com.example.messenger.R
+import com.example.messenger.ClientManager
+import com.example.messenger.DpiBypassPrefsManager
 import org.xmtp.android.library.SigningKey
 import androidx.navigation.NavController
 import androidx.lifecycle.LifecycleEventObserver
@@ -181,6 +183,37 @@ fun OnboardingScreen(
                 )
             }
             */
+
+            // DPI Bypass Toggle
+            var dpiEnabled by remember { mutableStateOf(DpiBypassPrefsManager.isEnabled(context)) }
+            
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.dpi_bypass_toggle),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.dpi_bypass_desc),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = dpiEnabled,
+                    onCheckedChange = { 
+                        dpiEnabled = it
+                        DpiBypassPrefsManager.setEnabled(context, it)
+                        ClientManager.refreshDpiBypassState(context)
+                    }
+                )
+            }
 
             // Secondary EOA Action
             TextButton(

@@ -14,7 +14,7 @@ class MessengerApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("MessengerApp", "onCreate started")
+        CallManager.init(this)
 
         try {
             initWalletConnect()
@@ -35,7 +35,7 @@ class MessengerApp : Application() {
     }
 
     private fun initWalletConnect() {
-        val projectId = "ab5f030c777b8cb780f7bf651d65bd7f"
+        val projectId = BuildConfig.WC_PROJECT_ID
         val relayUrl = "wss://relay.walletconnect.com?projectId=$projectId"
 
         val appMetaData = Core.Model.AppMetaData(
@@ -59,7 +59,6 @@ class MessengerApp : Application() {
         WalletConnectModal.initialize(
             init = Modal.Params.Init(core = CoreClient),
             onSuccess = {
-                Log.d("MessengerApp", "WalletConnect Modal SUCCESS")
                 WalletConnectManager.init(applicationContext)
                 ClientManager.tryRestoreClient(applicationContext)
             },
