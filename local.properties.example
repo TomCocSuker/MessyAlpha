@@ -1,0 +1,21 @@
+# Messy Android API Configuration Template
+# Copy this file to 'local.properties' and fill in your own values.
+
+# Web3Auth Client ID (https://dashboard.web3auth.io)
+WEB3AUTH_CLIENT_ID=your_web3auth_client_id
+
+# Web3Auth Verifier ID (e.g., messy-telegram-id)
+WEB3AUTH_VERIFIER_ID=your_verifier_id
+
+# Huddle01 Credentials (https://huddle01.com/dashboard)
+HUDDLE_PROJECT_ID=your_huddle_project_id
+HUDDLE_API_KEY=your_huddle_api_key
+
+# WalletConnect Project ID (https://cloud.walletconnect.com)
+WC_PROJECT_ID=your_walletconnect_project_id
+
+# Pimlico API Key (https://dashboard.pimlico.io)
+PIMLICO_API_KEY=your_pimlico_api_key
+
+# Backend Domain (Where your Telegram bot verifies JWTs)
+BACKEND_DOMAIN=https://your-backend.com
